@@ -115,63 +115,104 @@ class ViewControllerTests: XCTestCase {
         XCTAssertEqual(sut.title, "Storm Viewer")
     }
     
+    // Slightly appriopriate way when not using coordinators
+//    func testSelectingImageShowsDetail() {
+//        // Arrange
+//        let sut = ViewController()
+//        let navigationController = UINavigationController(rootViewController: sut)
+//        let testIndexPath = IndexPath(row: 0, section: 0)
+//
+//
+//        // Act
+//        sut.tableView(sut.tableView, didSelectRowAt: testIndexPath)
+//
+//
+//        // Create an expectation...
+//        let expectation = XCTestExpectation(description: "Selecteing a table view cell.")
+//
+//
+//        // ...then fulfill it asynchronously
+//        DispatchQueue.main.async {
+//            expectation.fulfill()
+//        }
+//
+//
+//        // Assert
+//        wait(for: [expectation], timeout: 1)
+//        XCTAssertTrue(navigationController.topViewController is DetailViewController)
+//    }
     
-    func testSelectingImageShowsDetail() {
+    
+    func testSelectingImageShowsDetails() {
         // Arrange
         let sut = ViewController()
-        let navigationController = UINavigationController(rootViewController: sut)
+        var selectedImage: String?
         let testIndexPath = IndexPath(row: 0, section: 0)
         
         
         // Act
+        sut.pictureSelectAction = {
+            selectedImage = $0
+        }
+        
         sut.tableView(sut.tableView, didSelectRowAt: testIndexPath)
         
         
-        // Create an expectation...
-        let expectation = XCTestExpectation(description: "Selecteing a table view cell.")
-        
-        
-        // ...then fulfill it asynchronously
-        DispatchQueue.main.async {
-            expectation.fulfill()
-        }
-        
-        
         // Assert
-        wait(for: [expectation], timeout: 1)
-        XCTAssertTrue(navigationController.topViewController is DetailViewController)
+        XCTAssertEqual(selectedImage, "nssl0049.jpg")
     }
+    
+    
+    // That one is also allright when not using Coordinator
+//    func testSelectingImageShowsDetailImage() {
+//        // Arrange
+//        let sut                     = ViewController()
+//        let navigationController    = UINavigationController(rootViewController: sut)
+//        let testIndexPath           = IndexPath(row: 0, section: 0)
+//
+//        let fileNameToTest          = "nssl0049.jpg"
+//        let imageToLoad             = UIImage(named: fileNameToTest, in: Bundle.main, compatibleWith: nil)
+//
+//
+//        // Act
+//        sut.tableView(sut.tableView, didSelectRowAt: testIndexPath)
+//
+//        let expectation = XCTestExpectation(description: "Selecting a table view cell.")
+//
+//        DispatchQueue.main.async { expectation.fulfill() }
+//
+//
+//        // Assert
+//        wait(for: [expectation], timeout: 1)
+//
+//        guard let detail = navigationController.topViewController as? DetailViewController else {
+//            XCTFail("Didn't push to DetailViewController.")
+//            return
+//        }
+//
+//        detail.loadViewIfNeeded()
+//
+//        XCTAssertEqual(detail.imageView.image, imageToLoad)
+//    }
     
     
     func testSelectingImageShowsDetailImage() {
         // Arrange
-        let sut                     = ViewController()
-        let navigationController    = UINavigationController(rootViewController: sut)
-        let testIndexPath           = IndexPath(row: 0, section: 0)
-        
-        let fileNameToTest          = "nssl0049.jpg"
-        let imageToLoad             = UIImage(named: fileNameToTest, in: Bundle.main, compatibleWith: nil)
+        let sut = ViewController()
+        let testIndexPath = IndexPath(row: 0, section: 0)
+        let fileNameToTest = "nssl0049.jpg"
+        let imageToLoad = UIImage(named: fileNameToTest, in: Bundle.main, compatibleWith: nil)
         
         
         // Act
-        sut.tableView(sut.tableView, didSelectRowAt: testIndexPath)
-        
-        let expectation = XCTestExpectation(description: "Selecting a table view cell.")
-        
-        DispatchQueue.main.async { expectation.fulfill() }
-        
-        
-        // Assert
-        wait(for: [expectation], timeout: 1)
-        
-        guard let detail = navigationController.topViewController as? DetailViewController else {
-            XCTFail("Didn't push to DetailViewController.")
-            return
+        sut.pictureSelectAction = {
+            let detailVC = DetailViewController()
+            detailVC.selectedImage = $0
+            detailVC.loadViewIfNeeded()
+            XCTAssertEqual(detailVC.imageView.image, imageToLoad)
         }
         
-        detail.loadViewIfNeeded()
-        
-        XCTAssertEqual(detail.imageView.image, imageToLoad)
+        sut.tableView(sut.tableView, didSelectRowAt: testIndexPath)
     }
     
     

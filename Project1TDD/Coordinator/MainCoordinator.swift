@@ -18,7 +18,20 @@ class MainCoordinator {
             fatalError("Missing initial view controller in Main.storybaord")
         }
         
+        // That assings a new closure to the pictureSelectAction property on our ViewController()
+        viewController.pictureSelectAction = { [weak self] in
+            guard let self = self else { return }
+            self.showDetail(for: $0)
+        }
+        
         navigationController.pushViewController(viewController, animated: false)
+    }
+    
+    
+    func showDetail(for filename: String) {
+        let destVC              = DetailViewController()
+        destVC.selectedImage    = filename
+        navigationController.pushViewController(destVC, animated: true)
     }
     
     
